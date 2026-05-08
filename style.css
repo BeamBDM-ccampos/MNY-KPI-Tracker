@@ -713,3 +713,128 @@ th.numeric {
     display: none !important;
   }
 }
+
+/* Extra Print / PDF Overrides for Account POD + Account Display Tables */
+@media print {
+  /* Account POD Details and Account Display Details containers */
+  #accountBreakdownSection,
+  #displayAccountSection {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  #accountBreakdownSection .account-card,
+  #displayAccountSection .account-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 6px !important;
+    margin: 8px 0 12px 0 !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+  }
+
+  #accountBreakdownSection .table-wrap,
+  #displayAccountSection .table-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+  }
+
+  #accountBreakdownSection table,
+  #displayAccountSection table {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+  }
+
+  #accountBreakdownSection th,
+  #accountBreakdownSection td,
+  #displayAccountSection th,
+  #displayAccountSection td {
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+    padding: 3px 4px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    vertical-align: middle !important;
+  }
+
+  /* Account POD Details: Brand column wider, POD emoji column narrow */
+  #accountBreakdownSection th:first-child,
+  #accountBreakdownSection td:first-child {
+    width: 82% !important;
+    text-align: left !important;
+  }
+
+  #accountBreakdownSection th:last-child,
+  #accountBreakdownSection td:last-child {
+    width: 18% !important;
+    text-align: center !important;
+    font-size: 10px !important;
+  }
+
+  /* Hide Brand Group dropdown on print */
+  #accountBreakdownSection .mini-filter,
+  #accountBreakdownSection select {
+    display: none !important;
+  }
+
+  #accountBreakdownSection .account-card-header {
+    display: block !important;
+    margin-bottom: 6px !important;
+  }
+
+  #accountBreakdownSection .account-card h3,
+  #displayAccountSection .account-card h3 {
+    font-size: 11px !important;
+    margin-bottom: 6px !important;
+    color: black !important;
+  }
+
+  /* Account Display Details: fit Brand Family + month columns */
+  #displayAccountSection th:first-child,
+  #displayAccountSection td:first-child {
+    width: 34% !important;
+    text-align: left !important;
+  }
+
+  #displayAccountSection th:not(:first-child),
+  #displayAccountSection td:not(:first-child) {
+    width: auto !important;
+    text-align: center !important;
+  }
+
+  #displayAccountSection .yes-pill,
+  #displayAccountSection .no-pill {
+    font-size: 7.5px !important;
+    padding: 1px 4px !important;
+    border-radius: 6px !important;
+  }
+
+  /* Prevent individual account boxes from splitting badly */
+  #accountBreakdownSection .account-card,
+  #displayAccountSection .account-card {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* But allow very large tables to continue if needed */
+  #accountBreakdownSection table,
+  #displayAccountSection table,
+  #accountBreakdownSection tbody,
+  #displayAccountSection tbody {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  #accountBreakdownSection tr,
+  #displayAccountSection tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
