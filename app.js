@@ -12,35 +12,66 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function bindEvents() {
-  document.getElementById("loadTrackerBtn").addEventListener("click", () => loadFilteredTrackerData().catch(err => setStatus("Error loading tracker data: " + err.message, true)));
-  document.getElementById("refreshTrackerBtn").addEventListener("click", () => loadFilteredTrackerData().catch(err => setStatus("Error refreshing tracker data: " + err.message, true)));
-  document.getElementById("printBtn").addEventListener("click", () => window.print());
+  const loadTrackerBtn = document.getElementById("loadTrackerBtn");
+  const refreshTrackerBtn = document.getElementById("refreshTrackerBtn");
+  const printBtn = document.getElementById("printBtn");
+  const bdmSelect = document.getElementById("bdmSelect");
+  const teamSelect = document.getElementById("teamSelect");
+  const repSelect = document.getElementById("repSelect");
 
-  document.getElementById("bdmSelect").addEventListener("change", e => {
-    state.bdm = e.target.value;
-    state.team = "";
-    state.rep = "";
-    clearAccountsAndData();
-    populateAlignmentDropdowns();
-    renderReport();
-  });
+  if (loadTrackerBtn) {
+    loadTrackerBtn.addEventListener("click", () => {
+      loadFilteredTrackerData().catch(err => setStatus("Error loading tracker data: " + err.message, true));
+    });
+  }
 
-  document.getElementById("teamSelect").addEventListener("change", e => {
-    state.team = e.target.value;
-    state.rep = "";
-    clearAccountsAndData();
-    resolveBdmFromTeamIfUnique();
-    populateAlignmentDropdowns();
-    renderReport();
-  });
+  if (refreshTrackerBtn) {
+    refreshTrackerBtn.addEventListener("click", () => {
+      loadFilteredTrackerData().catch(err => setStatus("Error refreshing tracker data: " + err.message, true));
+    });
+  }
 
-  document.getElementById("repSelect").addEventListener("change", e => {
-    state.rep = e.target.value;
-    clearAccountsAndData();
-    resolveBdmTeamFromRep();
-    populateAlignmentDropdowns();
-    renderReport();
-  });
+  if (printBtn) {
+    printBtn.addEventListener("click", () => window.print());
+  }
+
+  if (bdmSelect) {
+    bdmSelect.addEventListener("change", event => {
+      state.bdm = event.target.value;
+      state.team = "";
+      state.rep = "";
+      state.accounts = ["", "", "", "", "", ""];
+      state.accountBrandGroups = {};
+      resetTrackerDataOnly();
+      populateAlignmentDropdowns("bdm");
+      renderReport();
+    });
+  }
+
+  if (teamSelect) {
+    teamSelect.addEventListener("change", event => {
+      state.team = event.target.value;
+      state.rep = "";
+      state.accounts = ["", "", "", "", "", ""];
+      state.accountBrandGroups = {};
+      resetTrackerDataOnly();
+      resolveBdmFromSelection();
+      populateAlignmentDropdowns("team");
+      renderReport();
+    });
+  }
+
+  if (repSelect) {
+    repSelect.addEventListener("change", event => {
+      state.rep = event.target.value;
+      state.accounts = ["", "", "", "", "", ""];
+      state.accountBrandGroups = {};
+      resetTrackerDataOnly();
+      resolveBdmTeamFromRep();
+      populateAlignmentDropdowns("rep");
+      renderReport();
+    });
+  }
 }
 
 function buildAccountSelectors() {
