@@ -18,6 +18,13 @@ function bindEvents() {
   const bdmSelect = document.getElementById("bdmSelect");
   const teamSelect = document.getElementById("teamSelect");
   const repSelect = document.getElementById("repSelect");
+  const resetFieldsBtn = document.getElementById("resetFieldsBtn");
+
+  if (resetFieldsBtn) {
+    resetFieldsBtn.addEventListener("click", () => {
+      resetStartHereFields();
+    });
+  }
 
   if (loadTrackerBtn) {
     loadTrackerBtn.addEventListener("click", () => {
@@ -487,4 +494,21 @@ function hideLoadingBar(delay = 700) {
 
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function resetStartHereFields() {
+  state.bdm = "";
+  state.team = "";
+  state.rep = "";
+  state.accounts = ["", "", "", "", "", ""];
+  state.accountBrandGroups = {};
+
+  resetTrackerDataOnly();
+
+  populateAlignmentDropdowns();
+  populateAccountDropdowns();
+  renderReport();
+
+  hideLoadingBar(0);
+  setHint("Fields reset. Select a BDM, Team, or Sales Person to begin.");
 }
