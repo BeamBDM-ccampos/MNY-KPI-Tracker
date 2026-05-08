@@ -58,40 +58,11 @@ function populateAccountDropdowns() {
 function getAccountsByRep(rep) {
   if (!rep) return [];
 
-  let accountRows = trackerData.podBob.filter(row => {
-    const rowRep = getField(row, ["Sales Person", "SalesPerson", "Sales Rep"]);
-    const rowPremise = getField(row, ["PREMISE", "Premise"]);
-    const rowTeam = getField(row, ["Team"]);
-
-    return (
-      same(rowRep, rep) &&
-      isOffPremise(rowPremise)
-    );
-  });
-
-  // Fallback 1: if rep match fails, try Team + OFF.
-  if (!accountRows.length && state.team) {
-    accountRows = trackerData.podBob.filter(row => {
-      const rowTeam = getField(row, ["Team"]);
-      const rowPremise = getField(row, ["PREMISE", "Premise"]);
-
-      return (
-        same(rowTeam, state.team) &&
-        isOffPremise(rowPremise)
-      );
-    });
-  }
-
-  // Fallback 2: if premise values are blank or inconsistent, use rep only.
-  if (!accountRows.length) {
-    accountRows = trackerData.podBob.filter(row => {
-      const rowRep = getField(row, ["Sales Person", "SalesPerson", "Sales Rep"]);
-      return same(rowRep, rep);
-    });
-  }
-
-  const accounts = accountRows
-    .map(row => getField(row, ["Customer", "Account", "Customer Name"]))
+  const accounts = trackerData.podBob
+    .filter(row =>
+      same(getField(row, ["Sales Person"]), rep)
+    )
+    .map(row => getField(row, ["Customer"]))
     .filter(Boolean);
 
   return uniqueSorted(accounts);
