@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MNY BDM Tracker Off</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">MNY BDM Tracker</p>
+        <h1>Off Premise Tracker</h1>
+        <p class="subtitle">Start by selecting a BDM, Team, or Sales Person. Tracker data loads only after your selection, so the page stays fast.</p>
+      </div>
+      <div class="data-card">
+        <label>Google Sheets Database</label>
+        <p class="status-text">Required tabs: BDM Alignment, POD_Flat, POD_BOB_MNY, Display_Flat, and Display_BOB.</p>
+        <button id="refreshAlignmentBtn">Refresh Alignment</button>
+        <p id="uploadStatus" class="status-text">Ready to load alignment data.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Start Here</h2>
+          <p>Select a BDM, Team, or Sales Person. If you select Team first, choose a Sales Person so the correct BDM can be identified.</p>
+        </div>
+        <button id="loadTrackerBtn">Load Tracker Data</button>
+      </div>
+      <div class="filter-grid filter-grid-three">
+        <label>BDM<select id="bdmSelect"><option value="">Select BDM</option></select></label>
+        <label>Team<select id="teamSelect"><option value="">Select Team</option></select></label>
+        <label>Sales Person<select id="repSelect"><option value="">Select Sales Person</option></select></label>
+      </div>
+      <p id="selectionHint" class="hint-text">Load alignment data, then make a selection.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Account Selection</h2>
+          <p>Select up to six accounts after tracker data is loaded.</p>
+        </div>
+        <button id="refreshTrackerBtn" class="secondary">Refresh Tracker Data</button>
+      </div>
+      <div class="accounts-grid" id="accountSelectors"></div>
+    </section>
+
+    <section class="summary-grid">
+      <div class="summary-card"><span>POD Flat Rows</span><strong id="podRowCount">0</strong></div>
+      <div class="summary-card"><span>POD BOB Rows</span><strong id="podBobRowCount">0</strong></div>
+      <div class="summary-card"><span>Display Rows</span><strong id="displayRowCount">0</strong></div>
+    </section>
+
+    <section class="panel printable" id="trackerReport">
+      <div class="report-title-row">
+        <div>
+          <h2>MNY BDM Tracker Off Premise</h2>
+          <p id="reportSubTitle">Select BDM, Team, or Sales Person, then load tracker data.</p>
+        </div>
+        <button id="printBtn" class="secondary">Print / Save PDF</button>
+      </div>
+      <div id="podBtgSection"></div>
+      <div id="displayBtgSection"></div>
+      <div id="accountBreakdownSection"></div>
+      <div id="displayAccountSection"></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
