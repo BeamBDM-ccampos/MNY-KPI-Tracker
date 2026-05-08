@@ -1,4 +1,4 @@
-const APPS_SCRIPT_URL = "PASTE_YOUR_DEPLOYED_APPS_SCRIPT_WEB_APP_URL_HERE";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIsezIlT7ZkcB-aqw8Q7PKiaOwbKe7wn-QnFcT24iGX5XMkrM_MEVZh-rsr8QVEIXZ/exec";
 let trackerData = { podFlat: [], podBob: [], displayFlat: [], displayBob: [] };
 const state = { team: "", rep: "", accounts: ["", "", "", "", "", ""] };
 
