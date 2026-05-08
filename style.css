@@ -141,3 +141,40 @@ td.numeric, th.numeric { text-align: right; }
 @media (max-width: 860px) { .hero, .filter-grid, .accounts-grid, .summary-grid { grid-template-columns: 1fr; } .panel-header, .report-title-row { display: grid; } }
 @media (max-width: 700px) { .account-card-header { display: grid; } .mini-filter { min-width: 100%; } }
 @media print { body { background: white; } .data-card, #refreshAlignmentBtn, #loadTrackerBtn, #refreshTrackerBtn, #printBtn, .summary-grid, .panel:first-of-type, .panel:nth-of-type(2) { display: none !important; } .app-shell { width: 100%; padding: 0; } .panel { box-shadow: none; border: none; } }
+/* Print / PDF page break layout */
+@media print {
+  #accountSelectors {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  #podBtgSection {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  #displayBtgSection {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  #accountBreakdownSection {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  #displayAccountSection {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  .report-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .account-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}
