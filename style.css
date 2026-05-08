@@ -879,3 +879,71 @@ th.numeric {
     break-inside: auto !important;
   }
 }
+
+
+/* Print-only selected field summary */
+.print-selection-summary {
+  display: none;
+}
+
+@media print {
+  .print-selection-summary {
+    display: block !important;
+    margin-bottom: 18px !important;
+    padding: 12px !important;
+    border: 1px solid #ddd !important;
+    background: white !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .print-selection-summary h2 {
+    font-size: 14px !important;
+    margin: 0 0 10px 0 !important;
+    color: black !important;
+  }
+
+  .print-summary-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 10px !important;
+    font-size: 10px !important;
+  }
+
+  .print-summary-grid div {
+    border: 1px solid #ddd !important;
+    padding: 6px !important;
+    background: #fafafa !important;
+  }
+
+  .print-account-list {
+    font-size: 10px !important;
+  }
+
+  .print-account-list strong {
+    display: block !important;
+    margin-bottom: 4px !important;
+  }
+
+  .print-account-list ol {
+    margin: 0 !important;
+    padding-left: 18px !important;
+    columns: 2;
+  }
+
+  .print-account-list li {
+    margin-bottom: 3px !important;
+    break-inside: avoid !important;
+  }
+
+  /* Hide the live dropdown grid on print, since the print summary replaces it */
+  .account-selection-panel .accounts-grid {
+    display: none !important;
+  }
+
+  /* Hide Start Here live dropdowns on print */
+  .panel:first-of-type {
+    display: none !important;
+  }
+}
