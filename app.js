@@ -214,15 +214,6 @@ async function loadFilteredTrackerData() {
     state.accounts = ["", "", "", "", "", ""];
     state.accountBrandGroups = {};
 
-    document.getElementById("podRowCount").textContent =
-      trackerData.podFlat.length.toLocaleString();
-
-    document.getElementById("podBobRowCount").textContent =
-      trackerData.podBob.length.toLocaleString();
-
-    document.getElementById("displayRowCount").textContent =
-      trackerData.displayFlat.length.toLocaleString();
-
     populateAlignmentDropdowns("loaded");
     populateAccountDropdowns();
     renderReport();
@@ -430,7 +421,7 @@ function renderDisplayAccountTable(account) {
   return `<div class="account-card"><h3>${escapeHtml(account)} Display Details</h3><div class="table-wrap"><table><thead><tr><th>Brand Family</th>${months.map(month => `<th>${escapeHtml(month)}</th>`).join("")}</tr></thead><tbody>${rows.map(row => `<tr><td>${escapeHtml(row.family)}</td>${row.statuses.map(status => `<td>${status === "Yes" ? '<span class="yes-pill">Yes</span>' : '<span class="no-pill">No</span>'}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
 }
 function clearAccountsAndData() { state.accounts = ["", "", "", "", "", ""]; state.accountBrandGroups = {}; resetTrackerDataOnly(); }
-function resetTrackerDataOnly() { trackerData = { podFlat: [], podBob: [], displayFlat: [], displayBob: [] }; document.getElementById("podRowCount").textContent = "0"; document.getElementById("podBobRowCount").textContent = "0"; document.getElementById("displayRowCount").textContent = "0"; populateAccountDropdowns(); }
+function resetTrackerDataOnly() { trackerData = { podFlat: [], podBob: [], displayFlat: [], displayBob: [] }; populateAccountDropdowns(); }
 function resetTrackerViews() { resetTrackerDataOnly(); renderReport(); }
 function fillSelect(id, values, placeholder, selectedValue) { const select = document.getElementById(id); select.innerHTML = `<option value="">${placeholder}</option>` + values.map(value => `<option value="${escapeAttr(value)}">${escapeHtml(value)}</option>`).join(""); if (selectedValue && values.includes(selectedValue)) select.value = selectedValue; }
 function getField(row, candidates) { const keys = Object.keys(row || {}); const map = new Map(keys.map(key => [normalizeKey(key), key])); for (const candidate of candidates) { const key = map.get(normalizeKey(candidate)); if (key !== undefined) { const value = row[key]; return typeof value === "string" ? value.trim() : value; } } return ""; }
