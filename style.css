@@ -838,3 +838,44 @@ th.numeric {
     break-inside: avoid !important;
   }
 }
+
+/* Fix standalone report-header page in Print/PDF */
+@media print {
+  /* Hide the standalone report title row so it does not create its own page */
+  .report-title-row {
+    display: none !important;
+  }
+
+  /* Let the first real report section start immediately after Account Selection */
+  #podBtgSection {
+    page-break-before: auto !important;
+    break-before: auto !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  /* Do not force the POD section to jump away from the report header */
+  #podBtgSection .report-section {
+    page-break-before: auto !important;
+    break-before: auto !important;
+  }
+
+  /* Keep section titles attached to their tables */
+  .section-title {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  /* Allow tables to flow naturally instead of forcing blank pages */
+  .report-section {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  .table-wrap,
+  table,
+  tbody {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+}
