@@ -134,10 +134,99 @@ function renderAccountCard(account) {
   return `<div class="account-card"><h3>${escapeHtml(account)}</h3><div class="table-wrap"><table><thead><tr><th>Brand Group</th><th>Brand</th><th class="numeric">PODs</th></tr></thead><tbody>${detailRows.map(row => `<tr><td>${escapeHtml(row.brandGroup)}</td><td>${escapeHtml(row.brand)}</td><td class="numeric">${formatNumber(row.pods)}</td></tr>`).join("")}</tbody></table></div></div>`;
 }
 function renderDisplayAccountDetails() {
-  const section = document.getElementById("displayAccountSection"); const accounts = state.accounts.filter(Boolean); if (!accounts.length) { section.innerHTML = ""; return; }
-  const rows = trackerData.displayBob.filter(row => accounts.some(account => same(getField(row, ["Customer"]), account)) && same(getField(row, ["PREMISE", "Premise"]), "OFF")).map(row => ({ customer: getField(row, ["Customer"]), month: getField(row, ["Month"]), brandGoalGroup: getField(row, ["Brand Goal Group"]), setGoalType: getField(row, ["SET Goal Type"]), qualifierMet: getField(row, ["Qualifier Met"]), poes: getField(row, ["# POEs"]), posInd: getField(row, ["POS Ind"]), imageUrl: getField(row, ["Image URL"]) })).filter(row => row.customer || row.month || row.brandGoalGroup);
-  if (!rows.length) { section.innerHTML = emptySection("Account Display Details", "No account-level display details found for the selected accounts."); return; }
-  section.innerHTML = `<div class="report-section"><div class="section-title">Account Display Details</div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Month</th><th>Brand Goal Group</th><th>SET Goal Type</th><th>Qualifier Met</th><th class="numeric"># POEs</th><th>POS Ind</th><th>Image</th></tr></thead><tbody>${rows.map(row => `<tr><td>${escapeHtml(row.customer)}</td><td>${escapeHtml(row.month)}</td><td>${escapeHtml(row.brandGoalGroup)}</td><td>${escapeHtml(row.setGoalType)}</td><td>${Number(row.qualifierMet || 0) ? '<span class="yes-pill">Yes</span>' : '<span class="no-pill">No</span>'}</td><td class="numeric">${formatNumber(row.poes)}</td><td>${escapeHtml(row.posInd)}</td><td>${row.imageUrl ? `<a href="${escapeAttr(row.imageUrl)}" target="_blank" rel="noopener">Open</a>` : ""}</td></tr>`).join("")}</tbody></table></div></div>`;
+  const section = document.getElementById("displayAccountSection");
+  const accounts = state.accounts.filter(Boolean);
+
+  if (!accounts.length) {
+    section.innerHTML = "";
+    return;
+  }
+
+  section.innerHTML = `
+    <div class="report-section">
+      <div class="section-title">Account Display Details</div>
+      ${accounts.map(account => renderDisplayAccountTable(account)).join("")}
+    </div>
+  `;
+}
+function renderDisplayAccountTable(account) {
+  const accountRows = trackerData.displayBob.filter(row =>
+    same(getField(row, ["Customer"]), account) &&
+    isOffPremise(getField(row, ["PREMISE", "Premise"]))
+  );
+
+  if (!accountRows.length) {
+    return `
+      <div class="account-card">
+        <h3>${escapeHtml(account)} Display Details</h3>
+        <p class="empty">No display detail found for this account.</p>
+      </div>
+    `;
+  }
+
+  const months = uniqueSorted(
+    accountRows
+      .map(row => getField(row, ["Month"]))
+      .filter(Boolean)
+  );
+
+  const brandFamilies = uniqueSorted(
+    accountRows
+      .map(row => getField(row, ["Brand Goal Group"]))
+      .filter(Boolean)
+  );
+
+  const rows = brandFamilies.map(brandFamily => {
+    const monthStatuses = months.map(month => {
+      const matchingRows = accountRows.filter(row =>
+        same(getField(row, ["Brand Goal Group"]), brandFamily) &&
+        same(getField(row, ["Month"]), month)
+      );
+
+      const qualified = matchingRows.some(row =>
+        Number(getField(row, ["Qualifier Met"]) || 0) !== 0
+      );
+
+      return qualified ? "Yes" : "No";
+    });
+
+    return {
+      brandFamily,
+      monthStatuses
+    };
+  });
+
+  return `
+    <div class="account-card">
+      <h3>${escapeHtml(account)} Display Details</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Brand Family</th>
+              ${months.map(month => `<th>${escapeHtml(month)}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(row => `
+              <tr>
+                <td>${escapeHtml(row.brandFamily)}</td>
+                ${row.monthStatuses.map(status => `
+                  <td>
+                    ${
+                      status === "Yes"
+                        ? '<span class="yes-pill">Yes</span>'
+                        : '<span class="no-pill">No</span>'
+                    }
+                  </td>
+                `).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
 }
 function fillSelect(id, values, placeholder, selectedValue) { const select = document.getElementById(id); select.innerHTML = `<option value="">${placeholder}</option>` + values.map(value => `<option value="${escapeAttr(value)}">${escapeHtml(value)}</option>`).join(""); if (selectedValue && values.includes(selectedValue)) select.value = selectedValue; }
 function getField(row, candidates) { const keys = Object.keys(row || {}); const normalizedMap = new Map(keys.map(key => [normalizeKey(key), key])); for (const candidate of candidates) { const exactKey = normalizedMap.get(normalizeKey(candidate)); if (exactKey !== undefined) { const value = row[exactKey]; return typeof value === "string" ? value.trim() : value; } } return ""; }
