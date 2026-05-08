@@ -190,7 +190,7 @@ async function loadFilteredTrackerData() {
     await wait(350);
     updateLoadingBar(65, "Loading filtered data...");
 
-    await wait(1050);
+    await wait(30000);
     updateLoadingBar(85, "Almost there! Please do not close window...");
 
     const result = await resultPromise;
