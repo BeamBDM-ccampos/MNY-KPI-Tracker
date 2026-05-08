@@ -1,6 +1,11 @@
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwKctuxJb1AjwlMB6EifOKV1hvoJbdgjdfK9xVvQdRaBRUCLMBnv_nAK75GLhWzcbE/exec";
 let trackerData = { podFlat: [], podBob: [], displayFlat: [], displayBob: [] };
-const state = { team: "", rep: "", accounts: ["", "", "", "", "", ""] };
+const state = {
+  team: "",
+  rep: "",
+  accounts: ["", "", "", "", "", ""],
+  accountBrandGroups: {}
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   buildAccountSelectors();
@@ -120,18 +125,96 @@ function renderDisplayBtg() {
   section.innerHTML = `<div class="report-section"><div class="section-title">Display BTG</div><div class="table-wrap"><table><thead><tr><th>Brand</th><th class="numeric">Rep BTG</th><th class="numeric">Rep % Ach</th><th class="numeric">Team BTG</th><th class="numeric">Team % Ach</th></tr></thead><tbody>${rows.map(row => `<tr><td>${escapeHtml(row.brand)}</td><td class="numeric ${row.repBtg < 0 ? "bad" : "good"}">${formatNumber(row.repBtg)}</td><td class="numeric">${formatPercent(row.repAch)}</td><td class="numeric ${row.teamBtg < 0 ? "bad" : "good"}">${formatNumber(row.teamBtg)}</td><td class="numeric">${formatPercent(row.teamAch)}</td></tr>`).join("")}</tbody></table></div></div>`;
 }
 function renderAccountBreakdowns() {
-  const section = document.getElementById("accountBreakdownSection"); const accounts = state.accounts.filter(Boolean);
-  if (!accounts.length) { section.innerHTML = emptySection("Account POD Details", "Select at least one account to see account-level POD details."); return; }
-  section.innerHTML = `<div class="report-section"><div class="section-title">Account POD Details</div>${accounts.map(account => renderAccountCard(account)).join("")}</div>`;
+  const section = document.getElementById("accountBreakdownSection");
+  const accounts = state.accounts.filter(Boolean);
+
+  if (!accounts.length) {
+    section.innerHTML = emptySection(
+      "Account POD Details",
+      "Select at least one account to see account-level POD details."
+    );
+    return;
+  }
+
+  section.innerHTML = `
+    <div class="report-section">
+      <div class="section-title">Account POD Details</div>
+      ${accounts.map(account => renderAccountCard(account)).join("")}
+    </div>
+  `;
+
+  bindBrandGroupDropdowns();
 }
 function renderAccountCard(account) {
   const rows = trackerData.podBob.filter(row =>
-    same(getField(row, ["Customer", "Account", "Customer Name"]), account) &&
-    isOffPremise(getField(row, ["PREMISE", "Premise"]))
+    same(getField(row, ["Customer"]), account)
   );
-  const detailRows = rows.map(row => ({ brandGroup: getField(row, ["Brand Group"]), brand: getField(row, ["Brand"]), pods: getField(row, ["PODs"]) })).filter(row => row.brandGroup || row.brand || row.pods);
-  if (!detailRows.length) return `<div class="account-card"><h3>${escapeHtml(account)}</h3><p class="empty">No account-level POD detail found for this account.</p></div>`;
-  return `<div class="account-card"><h3>${escapeHtml(account)}</h3><div class="table-wrap"><table><thead><tr><th>Brand Group</th><th>Brand</th><th class="numeric">PODs</th></tr></thead><tbody>${detailRows.map(row => `<tr><td>${escapeHtml(row.brandGroup)}</td><td>${escapeHtml(row.brand)}</td><td class="numeric">${formatNumber(row.pods)}</td></tr>`).join("")}</tbody></table></div></div>`;
+
+  const brandGroups = uniqueSorted(
+    rows
+      .map(row => getField(row, ["Brand Group"]))
+      .filter(Boolean)
+  );
+
+  if (!brandGroups.length) {
+    return `
+      <div class="account-card">
+        <h3>${escapeHtml(account)}</h3>
+        <p class="empty">No account-level POD detail found for this account.</p>
+      </div>
+    `;
+  }
+
+  const selectedBrandGroup =
+    state.accountBrandGroups[account] || brandGroups[0];
+
+  state.accountBrandGroups[account] = selectedBrandGroup;
+
+  const detailRows = rows
+    .filter(row => same(getField(row, ["Brand Group"]), selectedBrandGroup))
+    .map(row => ({
+      brand: getField(row, ["Brand"]),
+      pods: Number(getField(row, ["PODs"]) || 0)
+    }))
+    .filter(row => row.brand);
+
+  return `
+    <div class="account-card">
+      <div class="account-card-header">
+        <h3>${escapeHtml(account)}</h3>
+
+        <label class="mini-filter">
+          Brand Group
+          <select class="brand-group-select" data-account="${escapeAttr(account)}">
+            ${brandGroups.map(group => `
+              <option value="${escapeAttr(group)}" ${same(group, selectedBrandGroup) ? "selected" : ""}>
+                ${escapeHtml(group)}
+              </option>
+            `).join("")}
+          </select>
+        </label>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Brand</th>
+              <th class="numeric">PODs</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${detailRows.map(row => `
+              <tr>
+                <td>${escapeHtml(row.brand)}</td>
+                <td class="numeric">${formatPodIcon(row.pods)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
 }
 function renderDisplayAccountDetails() {
   const section = document.getElementById("displayAccountSection");
@@ -146,6 +229,88 @@ function renderDisplayAccountDetails() {
     <div class="report-section">
       <div class="section-title">Account Display Details</div>
       ${accounts.map(account => renderDisplayAccountTable(account)).join("")}
+    </div>
+  `;
+}
+function renderDisplayAccountTable(account) {
+  const accountRows = trackerData.displayBob.filter(row =>
+    same(getField(row, ["Customer"]), account)
+  );
+
+  if (!accountRows.length) {
+    return `
+      <div class="account-card">
+        <h3>${escapeHtml(account)} Display Details</h3>
+        <p class="empty">No display detail found for this account.</p>
+      </div>
+    `;
+  }
+
+  const months = orderMonths(
+    uniqueSorted(
+      accountRows
+        .map(row => getField(row, ["Month"]))
+        .filter(Boolean)
+    )
+  );
+
+  const brandFamilies = uniqueSorted(
+    accountRows
+      .map(row => getField(row, ["Brand Goal Group"]))
+      .filter(Boolean)
+  );
+
+  const rows = brandFamilies.map(brandFamily => {
+    const monthStatuses = months.map(month => {
+      const matchingRows = accountRows.filter(row =>
+        same(getField(row, ["Brand Goal Group"]), brandFamily) &&
+        same(getField(row, ["Month"]), month)
+      );
+
+      const qualified = matchingRows.some(row =>
+        Number(getField(row, ["Qualifier Met"]) || 0) !== 0
+      );
+
+      return qualified ? "Yes" : "No";
+    });
+
+    return {
+      brandFamily,
+      monthStatuses
+    };
+  });
+
+  return `
+    <div class="account-card">
+      <h3>${escapeHtml(account)} Display Details</h3>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Brand Family</th>
+              ${months.map(month => `<th>${escapeHtml(month)}</th>`).join("")}
+            </tr>
+          </thead>
+
+          <tbody>
+            ${rows.map(row => `
+              <tr>
+                <td>${escapeHtml(row.brandFamily)}</td>
+                ${row.monthStatuses.map(status => `
+                  <td>
+                    ${
+                      status === "Yes"
+                        ? '<span class="yes-pill">Yes</span>'
+                        : '<span class="no-pill">No</span>'
+                    }
+                  </td>
+                `).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
     </div>
   `;
 }
@@ -250,3 +415,62 @@ function setStatus(message, isError = false) { const el = document.getElementByI
 function emptySection(title, message) { return `<div class="report-section"><div class="section-title">${escapeHtml(title)}</div><p class="empty">${escapeHtml(message)}</p></div>`; }
 function escapeHtml(value) { return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
 function escapeAttr(value) { return escapeHtml(value); }
+function formatPodIcon(value) {
+  const number = Number(value || 0);
+
+  if (number === 1) return "✅";
+  if (number === 0) return "❌";
+
+  return escapeHtml(number);
+}
+function bindBrandGroupDropdowns() {
+  document.querySelectorAll(".brand-group-select").forEach(select => {
+    select.addEventListener("change", event => {
+      const account = event.target.dataset.account;
+      const brandGroup = event.target.value;
+
+      state.accountBrandGroups[account] = brandGroup;
+
+      renderAccountBreakdowns();
+    });
+  });
+}
+function orderMonths(months) {
+  const monthOrder = {
+    JAN: 1,
+    JANUARY: 1,
+    FEB: 2,
+    FEBRUARY: 2,
+    MAR: 3,
+    MARCH: 3,
+    APR: 4,
+    APRIL: 4,
+    MAY: 5,
+    JUN: 6,
+    JUNE: 6,
+    JUL: 7,
+    JULY: 7,
+    AUG: 8,
+    AUGUST: 8,
+    SEP: 9,
+    SEPTEMBER: 9,
+    OCT: 10,
+    OCTOBER: 10,
+    NOV: 11,
+    NOVEMBER: 11,
+    DEC: 12,
+    DECEMBER: 12
+  };
+
+  return months.sort((a, b) => {
+    const aKey = String(a).trim().toUpperCase();
+    const bKey = String(b).trim().toUpperCase();
+
+    const aOrder = monthOrder[aKey] || 999;
+    const bOrder = monthOrder[bKey] || 999;
+
+    if (aOrder !== bOrder) return aOrder - bOrder;
+
+    return String(a).localeCompare(String(b));
+  });
+}
