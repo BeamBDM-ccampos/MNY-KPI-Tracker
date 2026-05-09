@@ -50,6 +50,25 @@
           <div id="loadingBar" class="loading-bar"></div>
         </div>
       </div>
+      <div id="bdmBulkEmailBox" class="bdm-bulk-email-box hidden">
+        <h3>Email BDM Rep Reports</h3>
+        <p>
+          This sends one email with a separate POD BTG and Display BTG PDF for each Sales Person under the selected BDM.
+        </p>
+      
+        <div class="bulk-email-grid">
+          <label>
+            Recipient Email
+            <input type="email" id="bdmReportEmail" placeholder="example@email.com" />
+          </label>
+      
+          <button id="sendBdmReportsBtn" type="button">
+            Send BDM Reports
+          </button>
+        </div>
+      
+        <p id="bdmEmailStatus" class="status-text"></p>
+      </div>
     </section>
 
     <section class="panel">
