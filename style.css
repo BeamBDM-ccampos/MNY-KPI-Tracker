@@ -947,3 +947,85 @@ th.numeric {
     display: none !important;
   }
 }
+
+/* Print Page 1: Only show boxed Account Selection summary */
+@media print {
+  /* Hide the live Start Here panel */
+  main > section.panel:first-of-type {
+    display: none !important;
+  }
+
+  /* Keep the Account Selection panel visible as page 1 */
+  .account-selection-panel {
+    display: block !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+
+  /* Hide Account Selection live heading, paragraph, buttons, and dropdowns */
+  .account-selection-panel > .panel-header,
+  .account-selection-panel > .accounts-grid,
+  .account-selection-panel #refreshTrackerBtn,
+  .account-selection-panel label,
+  .account-selection-panel select {
+    display: none !important;
+  }
+
+  /* Show only the boxed print summary */
+  .print-selection-summary {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    border: 1px solid #ddd !important;
+    background: white !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .print-selection-summary h2 {
+    font-size: 14px !important;
+    margin: 0 0 10px 0 !important;
+    color: black !important;
+  }
+
+  .print-summary-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 10px !important;
+    font-size: 10px !important;
+  }
+
+  .print-summary-grid div {
+    border: 1px solid #ddd !important;
+    padding: 6px !important;
+    background: #fafafa !important;
+  }
+
+  .print-account-list {
+    font-size: 10px !important;
+  }
+
+  .print-account-list strong {
+    display: block !important;
+    margin-bottom: 4px !important;
+  }
+
+  .print-account-list ol {
+    margin: 0 !important;
+    padding-left: 18px !important;
+    columns: 2;
+  }
+
+  .print-account-list li {
+    margin-bottom: 3px !important;
+    break-inside: avoid !important;
+  }
+}
