@@ -416,11 +416,25 @@ function populateAccountDropdowns() {
   const accounts = getAccountsByLoadedContext();
   for (let i = 0; i < 6; i++) fillSelect(`accountSelect${i}`, accounts, "Select Account", state.accounts[i]);
 }
+
 function getAccountsByLoadedContext() {
   let rows = trackerData.podBob || [];
-  if (state.rep) rows = rows.filter(row => same(getField(row, ["Sales Person"]), state.rep));
-  else if (state.team) rows = rows.filter(row => same(getField(row, ["Team"]), state.team));
-  return uniqueSorted(rows.map(row => getField(row, ["Customer"])).filter(Boolean));
+
+  if (state.rep) {
+    rows = rows.filter(row =>
+      same(getField(row, ["Sales Person"]), state.rep)
+    );
+  } else if (state.team) {
+    rows = rows.filter(row =>
+      same(getField(row, ["Team"]), state.team)
+    );
+  }
+
+  return uniqueSorted(
+    rows
+      .map(row => getField(row, ["Customer"]))
+      .filter(Boolean)
+  );
 }
 
 function renderReport() {
