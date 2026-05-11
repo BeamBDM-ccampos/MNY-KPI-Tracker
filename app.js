@@ -1,7 +1,7 @@
 const MODE_CONFIG = {
   off: {
     label: "Off Premise",
-    scriptUrl: "https://script.google.com/macros/s/AKfycbw-1pq4at34W6JRDkrRsraNeXEHpvTQCKfst8fFx0OpR-Bu_DDGh1lwae-wVELOeJhL/exec",
+    scriptUrl: "https://script.google.com/macros/s/AKfycbwLkrgsz6DkcjDTZRK2n-Fs6GvRkIFmonkvZM5dLVAvc46PDo4yeTqJC-b0cHCi4ps/exec",
     secondaryLabel: "Display",
     secondaryDetailLabel: "Account Display Details",
     secondaryDetailType: "monthly"
@@ -9,7 +9,7 @@ const MODE_CONFIG = {
 
   on: {
     label: "On Premise",
-    scriptUrl: "https://script.google.com/macros/s/AKfycbzKyw0HWbnwa2bw_C5OIO0DxctKfKf_4CkQmeHFb8vskmJXYx3pywW36owf_ov4X6UX3w/exec",
+    scriptUrl: "https://script.google.com/macros/s/AKfycby0WRqo90cmELMbXooMsTa2TKV42lXo8FM9xU2pefJO4AdCzp8U67O7RswBA9HPwTizFg/exec",
     secondaryLabel: "Menu",
     secondaryDetailLabel: "Account Menu Details",
     secondaryDetailType: "captured"
@@ -208,10 +208,17 @@ async function loadAlignmentData() {
   const result = await postToAppsScript({ action: "getAlignmentData" });
   if (!result.success) throw new Error(result.message || "Could not load alignment data.");
   alignmentData = result.data || [];
-  state.bdm = ""; state.team = ""; state.rep = "";
+  state.spreadsheetLastUpdated = result.spreadsheetLastUpdated || "";
+  
+  state.bdm = "";
+  state.team = "";
+  state.rep = "";
+  
   clearAccountsAndData();
   populateAlignmentDropdowns();
+  updateModeLabels();
   renderReport();
+  
   setStatus(`Alignment data loaded: ${alignmentData.length.toLocaleString()} rows.`);
 }
 
@@ -882,8 +889,8 @@ function updateModeLabels() {
   }
 
   if (subtitle) {
-    subtitle.textContent =
-      `Start by selecting a BDM, Team, or Sales Person. ${config.secondaryLabel} data loads only after your selection, so the page stays fast.`;
+    const updateDate = state.spreadsheetLastUpdated || "Loading...";
+    subtitle.innerHTML = `Updated with Info Extracted on: <strong>${escapeHtml(updateDate)}</strong>`;
   }
 
   if (trackerReportTitle) {
