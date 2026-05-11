@@ -1,4 +1,24 @@
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-1pq4at34W6JRDkrRsraNeXEHpvTQCKfst8fFx0OpR-Bu_DDGh1lwae-wVELOeJhL/exec";
+const MODE_CONFIG = {
+  off: {
+    label: "Off Premise",
+    scriptUrl: "https://script.google.com/macros/s/AKfycbw-1pq4at34W6JRDkrRsraNeXEHpvTQCKfst8fFx0OpR-Bu_DDGh1lwae-wVELOeJhL/exec",
+    secondaryLabel: "Display",
+    secondaryDetailLabel: "Account Display Details",
+    secondaryDetailType: "monthly"
+  },
+
+  on: {
+    label: "On Premise",
+    scriptUrl: "https://script.google.com/macros/s/AKfycbzKyw0HWbnwa2bw_C5OIO0DxctKfKf_4CkQmeHFb8vskmJXYx3pywW36owf_ov4X6UX3w/exec",
+    secondaryLabel: "Menu",
+    secondaryDetailLabel: "Account Menu Details",
+    secondaryDetailType: "captured"
+  }
+};
+
+function getAppsScriptUrl() {
+  return MODE_CONFIG[state.mode].scriptUrl;
+}
 
 let alignmentData = [];
 let trackerData = {
@@ -7,7 +27,15 @@ let trackerData = {
   podBob: [],
   displayBob: []
 };
-const state = { bdm: "", team: "", rep: "", accounts: ["", "", "", "", "", ""], accountBrandGroups: {} };
+
+const state = {
+  mode: "off",
+  bdm: "",
+  team: "",
+  rep: "",
+  accounts: ["", "", "", "", "", ""],
+  accountBrandGroups: {}
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   buildAccountSelectors();
@@ -251,10 +279,18 @@ async function loadFilteredTrackerData() {
 }
 
 async function postToAppsScript(payload) {
-  const response = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+  const response = await fetch(getAppsScriptUrl(), {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+
   const text = await response.text();
-  try { return JSON.parse(text); }
-  catch { throw new Error("Apps Script did not return valid JSON. Check the deployment URL and access permissions."); }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    throw new Error("Apps Script did not return valid JSON. Check the deployment URL and access permissions.");
+  }
 }
 
 function populateAlignmentDropdowns() {
