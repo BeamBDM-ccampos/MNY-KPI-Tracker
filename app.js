@@ -1,7 +1,7 @@
 const MODE_CONFIG = {
   off: {
     label: "Off Premise",
-    scriptUrl: "https://script.google.com/macros/s/AKfycbwLkrgsz6DkcjDTZRK2n-Fs6GvRkIFmonkvZM5dLVAvc46PDo4yeTqJC-b0cHCi4ps/exec",
+    scriptUrl: "https://script.google.com/macros/s/AKfycbyIHdknTaHa-QdlLRrdZfjhHQvhd1z-h1KeQQHGkS4P9oG93euOQmkXpNwiBU1b69jB/exec",
     secondaryLabel: "Display",
     secondaryDetailLabel: "Account Display Details",
     secondaryDetailType: "monthly"
@@ -9,7 +9,7 @@ const MODE_CONFIG = {
 
   on: {
     label: "On Premise",
-    scriptUrl: "https://script.google.com/macros/s/AKfycby0WRqo90cmELMbXooMsTa2TKV42lXo8FM9xU2pefJO4AdCzp8U67O7RswBA9HPwTizFg/exec",
+    scriptUrl: "https://script.google.com/macros/s/AKfycbwhX1noXoFrY5NHtkWgtFxfpp3DuAvO1Frdejg7hKLlZOl2-F8oidjDicpiMzMX-STLKw/exec",
     secondaryLabel: "Menu",
     secondaryDetailLabel: "Account Menu Details",
     secondaryDetailType: "captured"
@@ -889,7 +889,7 @@ function updateModeLabels() {
   }
 
   if (subtitle) {
-    const updateDate = state.spreadsheetLastUpdated || "Loading...";
+    const updateDate = state.spreadsheetLastUpdated || "Unavailable";
     subtitle.innerHTML = `Updated with Info Extracted on: <strong>${escapeHtml(updateDate)}</strong>`;
   }
 
